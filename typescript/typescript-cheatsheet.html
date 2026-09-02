@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TypeScript Cheatsheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0c1a26;
+    --panel: #10222f;
+    --panel-border: rgba(125, 211, 252, 0.14);
+    --grid-line: rgba(125, 211, 252, 0.055);
+    --text: #dfe9f2;
+    --text-dim: #7e94a8;
+    --blue: #62a6d8;
+    --cyan: #7dd3fc;
+    --amber: #f0b563;
+    --green: #8fd4a8;
+    --code-bg: #0a1620;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 34px 34px,
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 34px 34px,
+      var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    padding: 0 0 80px;
+    line-height: 1.5;
+  }
+
+  header {
+    padding: 64px 40px 48px;
+    max-width: 1180px;
+    margin: 0 auto;
+    border-bottom: 1px solid var(--panel-border);
+  }
+
+  .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--cyan);
+    letter-spacing: 0.02em;
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(34px, 5vw, 52px);
+    margin-top: 10px;
+    color: #f3f7fb;
+  }
+
+  h1 span { color: var(--blue); }
+
+  .subtitle {
+    margin-top: 14px;
+    max-width: 640px;
+    color: var(--text-dim);
+    font-size: 15.5px;
+  }
+
+  .legend {
+    display: flex;
+    gap: 24px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text-dim);
+  }
+
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.blue { background: var(--blue); }
+  .dot.amber { background: var(--amber); }
+  .dot.green { background: var(--green); }
+
+  main {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 48px 40px 0;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 22px;
+  }
+
+  .card {
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    padding: 26px 26px 22px;
+  }
+
+  .card::before, .card::after,
+  .corner-tl, .corner-br {
+    content: "";
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-color: var(--blue);
+    opacity: 0.65;
+  }
+  .card::before {
+    top: -1px; left: -1px;
+    border-top: 2px solid var(--blue);
+    border-left: 2px solid var(--blue);
+  }
+  .card::after {
+    bottom: -1px; right: -1px;
+    border-bottom: 2px solid var(--blue);
+    border-right: 2px solid var(--blue);
+  }
+
+  .card-index {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+
+  .card h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 20px;
+    color: #f3f7fb;
+    margin-top: 6px;
+    margin-bottom: 4px;
+  }
+
+  .card .desc {
+    color: var(--text-dim);
+    font-size: 13.5px;
+    margin-bottom: 16px;
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid rgba(125, 211, 252, 0.08);
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.8px;
+    line-height: 1.65;
+    margin-bottom: 12px;
+  }
+  pre:last-child { margin-bottom: 0; }
+
+  .cm { color: #5c7085; }
+  .kw { color: var(--blue); }
+  .tp { color: var(--cyan); }
+  .st { color: var(--green); }
+  .fn { color: #d3b8f7; }
+
+  .note {
+    display: flex;
+    gap: 10px;
+    background: rgba(240, 181, 99, 0.08);
+    border-left: 2px solid var(--amber);
+    padding: 10px 14px;
+    font-size: 12.8px;
+    color: #e6c88f;
+    margin-top: 14px;
+  }
+  .note b { color: var(--amber); }
+
+  .rn-tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--bg);
+    background: var(--cyan);
+    padding: 2px 7px;
+    margin-left: 8px;
+    vertical-align: middle;
+    letter-spacing: 0.03em;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text-dim);
+    margin: 56px 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--panel-border);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  footer {
+    max-width: 1180px;
+    margin: 60px auto 0;
+    padding: 24px 40px 0;
+    border-top: 1px solid var(--panel-border);
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+  }
+
+  @media (max-width: 640px) {
+    header, main, footer { padding-left: 20px; padding-right: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kicker">// yigit's field notes</div>
+  <h1>TypeScript <span>Cheatsheet</span></h1>
+  <p class="subtitle">React Native stajı öncesi hazırlık için derlenmiş, sık kullanılan ve unutulunca canını sıkan TypeScript konuları. Sıralama önem sırasına göre değil, konu bütünlüğüne göre.</p>
+  <div class="legend">
+    <div class="legend-item"><span class="dot blue"></span> temel kavram</div>
+    <div class="legend-item"><span class="dot amber"></span> sık yapılan hata</div>
+    <div class="legend-item"><span class="dot green"></span><span class="rn-tag">RN</span> React Native'de özellikle karşına çıkar</div>
+  </div>
+</header>
+
+<main>
+
+  <div class="section-label"><span>01 — TEMELLER</span><span>foundations</span></div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-index">TYPE / 01</div>
+      <h2>Temel tipler</h2>
+      <p class="desc">JS'teki primitive'lerin üzerine tip etiketi koyman.</p>
+      <pre><span class="kw">let</span> age: <span class="tp">number</span> = <span class="fn">25</span>;
+<span class="kw">let</span> name: <span class="tp">string</span> = <span class="st">"Yigit"</span>;
+<span class="kw">let</span> isIntern: <span class="tp">boolean</span> = <span class="kw">true</span>;
+<span class="kw">let</span> data: <span class="tp">unknown</span>; <span class="cm">// any'nin güvenli hali</span>
+<span class="kw">let</span> nothing: <span class="tp">null</span> | <span class="tp">undefined</span>;</pre>
+      <div class="note"><b>dikkat</b> — <span class="tp">any</span> kullanmak tip kontrolünü tamamen kapatır. Elinden geldiğince <span class="tp">unknown</span> tercih et, gerekirse daralt (narrowing).</div>
+    </div>
+
+    <div class="card">
+      <div class="card-index">TYPE / 02</div>
+      <h2>Array ve Tuple</h2>
+      <p class="desc">Tuple, uzunluğu ve sırası sabit array demek.</p>
+      <pre><span class="kw">let</span> scores: <span class="tp">number</span>[] = [<span class="fn">90</span>, <span class="fn">85</span>, <span class="fn">70</span>];
+<span class="kw">let</span> names: <span class="tp">Array</span>&lt;<span class="tp">string</span>&gt; = [<span class="st">"a"</span>, <span class="st">"b"</span>];
+
+<span class="cm">// Tuple: sabit uzunluk, sabit sıra</span>
+<span class="kw">let</span> point: [<span class="tp">number</span>, <span class="tp">number</span>] = [<span class="fn">10</span>, <span class="fn">20</span>];
+<span class="kw">let</span> entry: [<span class="tp">string</span>, <span class="tp">boolean</span>] = [<span class="st">"done"</span>, <span class="kw">true</span>];</pre>
+    </div>
+
+    <div class="card">
+      <div class="card-index">TYPE / 03</div>
+      <h2>Interface vs Type</h2>
+      <p class="desc">İkisi de şekil tanımlar, farkları genişletilebilirlik ve kapsamda.</p>
+      <pre><span class="kw">interface</span> User {
+  name: <span class="tp">string</span>;
+  age: <span class="tp">number</span>;
+}
+<span class="cm">// aynı isimle tekrar tanımlarsan birleşir (declaration merging)</span>
+<span class="kw">interface</span> User {
+  email: <span class="tp">string</span>;
+}
+
+<span class="kw">type</span> UserType = {
+  name: <span class="tp">string</span>;
+  age: <span class="tp">number</span>;
+};
+<span class="cm">// type union/intersection da yapabilir, interface yapamaz</span>
+<span class="kw">type</span> ID = <span class="tp">string</span> | <span class="tp">number</span>;</pre>
+      <div class="note"><b>kural</b> — obje/component prop şekli tanımlarken <span class="tp">interface</span>, union/intersection gerekince <span class="tp">type</span> kullan. Kesin bir kural yok, tutarlılık önemli.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-index">TYPE / 04</div>
+      <h2>Literal tipler ve Enum</h2>
+      <p class="desc">Belirli değerlerle sınırlanmış tipler.</p>
+      <pre><span class="kw">type</span> Status = <span class="st">'loading'</span> | <span class="st">'success'</span> | <span class="st">'error'</span>;
+
+<span class="kw">function</span> <span class="fn">handle</span>(status: Status) {
+  <span class="kw">if</span> (status === <span class="st">'error'</span>) { <span class="cm">/* ... */</span> }
+}
+
+<span class="cm">// enum alternatifi, genelde literal union tercih edilir</span>
+<span class="kw">enum</span> Direction {
+  Up, Down, Left, Right
+}</pre>
+      <div class="note"><b>dikkat</b> — <span class="tp">enum</span> derlenmiş JS'te ekstra kod üretir ve tree-shaking dostu değildir. RN projelerinde çoğunlukla literal union tercih edilir.</div>
+    </div>
+
+  </div>
+
+  <div class="section-label"><span>02 — FONKSİYONLAR</span><span>functions, in depth</span></div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-index">TYPE / 05</div>
+      <h2>Fonksiyon tipleri</h2>
+      <p class="desc">Parametre, opsiyonel parametre, default değer, rest.</p>
+      <pre><span class="kw">function</span> <span class="fn">add</span>(a: <span class="tp">number</span>, b: <span class="tp">number</span>): <span class="tp">number</span> {
+  <span class="kw">return</span> a + b;
+}
+
+<span class="cm">// opsiyonel parametre: ? ile</span>
+<span class="kw">function</span> <span class="fn">greet</span>(name: <span class="tp">string</span>, title?: <span class="tp">string</span>) {}
+
+<span class="cm">// default değer</span>
+<span class="kw">function</span> <span class="fn">multiply</span>(a: <span class="tp">number</span>, b: <span class="tp">number</span> = <span class="fn">2</span>) {}
+
+<span class="cm">// rest parametre</span>
+<span class="kw">function</span> <span class="fn">sum</span>(...nums: <span class="tp">number</span>[]): <span class="tp">number</span> {
+  <span class="kw">return</span> nums.<span class="fn">reduce</span>((a, b) =&gt; a + b, <span class="fn">0</span>);
+}</pre>
+    </div>
+
+    <div class="card">
+      <div class="card-index">TYPE / 06</div>
+      <h2>Arrow function tipleri</h2>
+      <p class="desc">Ok fonksiyonlarında tip yazımı normal fonksiyonla aynı mantık, sadece syntax farklı.</p>
+      <pre><span class="cm">// temel arrow function</span>
+<span class="kw">const</span> add = (a: <span class="tp">number</span>, b: <span class="tp">number</span>): <span class="tp">number</span> =&gt; a + b;
+
+<span class="cm">// dönüş tipi genelde çıkarılır (inference), yazmak zorunda değilsin</span>
+<span class="kw">const</span> greet = (name: <span class="tp">string</span>) =&gt; <span class="st">`Merhaba ${name}`</span>;
+
+<span class="cm">// gövdesi { } olduğunda return tipini TS otomatik anlar</span>
+<span class="kw">const</span> isEven = (n: <span class="tp">number</span>) =&gt; {
+  <span class="kw">return</span> n % <span class="fn">2</span> === <span class="fn">0</span>; <span class="cm">// boolean olarak çıkarılır</span>
+};
+
+<span class="cm">// parametresiz</span>
+<span class="kw">const</span> getTimestamp = (): <span class="tp">number</span> =&gt; Date.<span class="fn">now</span>();</pre>
+      <div class="note"><b>fark</b> — arrow function'lar kendi <span class="tp">this</span>'ini bağlamaz, çevresindeki scope'un <span class="tp">this</span>'ini kullanır. Class component metotlarında (artık nadir) bu yüzden tercih edilirdi.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-index">TYPE / 07</div>
+      <h2>Fonksiyonu değer olarak tiplemek</h2>
+      <p class="desc">Bir fonksiyonu parametre ya da prop olarak geçerken tipini nasıl yazarsın.</p>
+      <pre><span class="cm">// fonksiyon tipi: (parametreler) => dönüş tipi</span>
+<span class="kw">type</span> AddFn = (a: <span class="tp">number</span>, b: <span class="tp">number</span>) =&gt; <span class="tp">number</span>;
+
+<span class="kw">const</span> add: AddFn = (a, b) =&gt; a + b; <span class="cm">// parametrelerin tipini tekrar yazmana gerek yok</span>
+
+<span class="cm">// callback parametresi olarak fonksiyon almak</span>
+<span class="kw">function</span> <span class="fn">repeat</span>(times: <span class="tp">number</span>, callback: (index: <span class="tp">number</span>) =&gt; <span class="tp">void</span>) {
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="fn">0</span>; i &lt; times; i++) callback(i);
+}
+
+<span class="fn">repeat</span>(<span class="fn">3</span>, (i) =&gt; console.<span class="fn">log</span>(i)); <span class="cm">// i otomatik number olarak çıkarılır</span>
+
+<span class="cm">// void dönüş tipi: "dönüş değeri önemli değil" demek, undefined ile aynı değil</span></pre>
+      <div class="note"><b>RN'de nerede görürsün</b> <span class="rn-tag">RN</span> — <span class="tp">onPress: () =&gt; void</span>, <span class="tp">onChangeText: (text: string) =&gt; void</span> gibi prop tanımlarının tamamı bu mantıkla yazılır.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-index">TYPE / 08</div>
+      <h2>Async / await ve Promise</h2>
+      <p class="desc">Asenkron fonksiyonların dönüş tipi her zaman bir Promise'e sarılır.</p>
+      <pre><span class="cm">// dönüş tipi otomatik Promise<T> olur, T'yi belirtmen yeterli</span>
+<span class="kw">async</span> <span class="kw">function</span> <span class="fn">fetchUser</span>(id: <span class="tp">number</span>): <span class="tp">Promise</span>&lt;User&gt; {
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(<span class="st">`/users/${id}`</span>);
+  <span class="kw">return</span> res.<span class="fn">json</span>(); <span class="cm">// TS burada User olduğuna güvenir, kontrol etmez</span>
+}
+
+<span class="cm">// çağırırken await edersen Promise açılır, T kalır</span>
+<span class="kw">const</span> user = <span class="kw">await</span> <span class="fn">fetchUser</span>(<span class="fn">1</span>); <span class="cm">// user: User</span>
+
+<span class="cm">// dönüş değeri olmayan async fonksiyon</span>
+<span class="kw">async</span> <span class="kw">function</span> <span class="fn">logIn</span>(): <span class="tp">Promise</span>&lt;<span class="tp">void</span>&gt; {
+  <span class="kw">await</span> <span class="fn">authenticate</span>();
+}</pre>
+      <div class="note"><b>dikkat</b> — <span class="tp">res.json()</span> tipi aslında <span class="tp">any</span> döner, <span class="tp">Promise&lt;User&gt;</span> yazman TS'e güvenmesini söyler ama runtime'da veri gerçekten o şekilde gelmeyebilir. API response'unu doğrulamak istersen zod gibi bir kütüphane işine yarar.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-index">TYPE / 09</div>
+      <h2>Fonksiyon overload</h2>
+      <p class="desc">Aynı fonksiyonun farklı parametre kombinasyonlarıyla farklı davranmasını tiplemek.</p>
+      <pre><span class="cm">// overload imzaları (implementasyonsuz, sadece tip bildirimi)</span>
+<span class="kw">function</span> <span class="fn">makeId</span>(value: <span class="tp">number</span>): <span class="tp">number</span>;
+<span class="kw">function</span> <span class="fn">makeId</span>(value: <span class="tp">string</span>): <span class="tp">string</span>;
+
+<span class="cm">// gerçek implementasyon, parametre tipi union olmalı</span>
+<span class="kw">function</span> <span class="fn">makeId</span>(value: <span class="tp">number</span> | <span class="tp">string</span>) {
+  <span class="kw">return</span> value;
+}
+
+<span class="kw">const</span> a = <span class="fn">makeId</span>(<span class="fn">5</span>);      <span class="cm">// tip: number</span>
+<span class="kw">const</span> b = <span class="fn">makeId</span>(<span class="st">"x"</span>);    <span class="cm">// tip: string</span></pre>
+      <div class="note"><b>ne zaman gerekir</b> — günlük RN kodunda nadiren ihtiyaç duyarsın, ama bir kütüphanenin tip tanımlarını okurken (örneğin react-navigation) sık karşına çıkar, o yüzden tanıması önemli.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-index">TYPE / 10</div>
+      <h2>Union &amp; Intersection</h2>
+      <p class="desc">Union "ya bu ya bu", intersection "hepsi birden".</p>
+      <pre><span class="kw">type</span> ID = <span class="tp">string</span> | <span class="tp">number</span>; <span class="cm">// union</span>
+
+<span class="kw">type</span> Named = { name: <span class="tp">string</span> };
+<span class="kw">type</span> Aged = { age: <span class="tp">number</span> };
+<span class="kw">type</span> Person = Named &amp; Aged; <span class="cm">// intersection</span>
+
+<span class="kw">const</span> p: Person = { name: <span class="st">"Yigit"</span>, age: <span class="fn">21</span> };</pre>
+    </div>
+
+    <div class="card">
+      <div class="card-index">TYPE / 11</div>
+      <h2>Type narrowing</h2>
+      <p class="desc">Union tipi runtime kontrolüyle daraltmak.</p>
+      <pre><span class="kw">function</span> <span class="fn">printId</span>(id: <span class="tp">string</span> | <span class="tp">number</span>) {
+  <span class="kw">if</span> (<span class="kw">typeof</span> id === <span class="st">'string'</span>) {
+    console.<span class="fn">log</span>(id.<span class="fn">toUpperCase</span>()); <span class="cm">// artık string</span>
+  } <span class="kw">else</span> {
+    console.<span class="fn">log</span>(id.<span class="fn">toFixed</span>(<span class="fn">2</span>)); <span class="cm">// artık number</span>
+  }
+}
+
+<span class="cm">// obje tiplerinde: 'in' operatörü</span>
+<span class="kw">if</span> (<span class="st">'email'</span> <span class="kw">in</span> user) { <span class="cm">/* ... */</span> }
+
+<span class="cm">// class instance'larda: instanceof</span>
+<span class="kw">if</span> (error <span class="kw">instanceof</span> Error) { <span class="cm">/* ... */</span> }</pre>
+    </div>
+
+    <div class="card">
+      <div class="card-index">TYPE / 12</div>
+      <h2>Optional chaining &amp; nullish</h2>
+      <p class="desc">null/undefined kontrolünü kısaltan operatörler.</p>
+      <pre><span class="cm">// optional chaining: zincirde biri null/undefined ise durur</span>
+<span class="kw">const</span> city = user?.address?.city;
+
+<span class="cm">// nullish coalescing: sadece null/undefined ise fallback verir</span>
+<span class="kw">const</span> displayName = user.name ?? <span class="st">'Anonim'</span>;
+
+<span class="cm">// dikkat: || farklıdır, 0 ve "" gibi falsy değerleri de değiştirir</span>
+<span class="kw">const</span> count = user.score || <span class="fn">10</span>; <span class="cm">// score 0 ise 10 olur, muhtemelen istemezsin</span>
+<span class="kw">const</span> countFixed = user.score ?? <span class="fn">10</span>; <span class="cm">// score 0 ise 0 kalır</span></pre>
+      <div class="note"><b>sık hata</b> — <span class="tp">||</span> ile <span class="tp">??</span> karıştırılır. Sayısal değerlerde (score, count) neredeyse hep <span class="tp">??</span> istersin.</div>
+    </div>
+
+  </div>
+
+  <div class="section-label"><span>03 — GENERİC'LER &amp; YARDIMCI TİPLER</span><span>generics &amp; utility types</span></div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-index">TYPE / 13</div>
+      <h2>Generics</h2>
+      <p class="desc">Tipi çağrı anında parametre gibi geçmek.</p>
+      <pre><span class="kw">function</span> <span class="fn">wrapInArray</span>&lt;T&gt;(item: T): T[] {
+  <span class="kw">return</span> [item];
+}
+
+<span class="kw">const</span> nums = <span class="fn">wrapInArray</span>&lt;<span class="tp">number</span>&gt;(<span class="fn">5</span>); <span class="cm">// number[]</span>
+
+<span class="cm">// birden fazla generic parametresi</span>
+<span class="kw">function</span> <span class="fn">merge</span>&lt;A, B&gt;(a: A, b: B): A &amp; B {
+  <span class="kw">return</span> { ...a, ...b };
+}
+
+<span class="cm">// generic'e kısıt (constraint) koymak</span>
+<span class="kw">function</span> <span class="fn">getLength</span>&lt;T <span class="kw">extends</span> { length: <span class="tp">number</span> }&gt;(item: T) {
+  <span class="kw">return</span> item.length;
+}</pre>
+      <div class="note"><b>RN'de nerede görürsün</b> — <span class="tp">useState&lt;string | null&gt;(null)</span>, <span class="tp">useRef&lt;TextInput&gt;(null)</span> ve API response tiplerinde her yerde.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-index">TYPE / 14</div>
+      <h2>Utility types</h2>
+      <p class="desc">TypeScript'in hazır sağladığı tip dönüştürücüler.</p>
+      <pre><span class="kw">interface</span> User { id: <span class="tp">number</span>; name: <span class="tp">string</span>; email: <span class="tp">string</span>; }
+
+<span class="tp">Partial</span>&lt;User&gt;      <span class="cm">// tüm alanlar opsiyonel</span>
+<span class="tp">Required</span>&lt;User&gt;     <span class="cm">// tüm alanlar zorunlu</span>
+<span class="tp">Readonly</span>&lt;User&gt;     <span class="cm">// tüm alanlar salt okunur</span>
+<span class="tp">Pick</span>&lt;User, <span class="st">'id'</span> | <span class="st">'name'</span>&gt;   <span class="cm">// sadece seçilenler</span>
+<span class="tp">Omit</span>&lt;User, <span class="st">'email'</span>&gt;        <span class="cm">// seçilenler hariç</span>
+<span class="tp">Record</span>&lt;<span class="tp">string</span>, User&gt;       <span class="cm">// key-value map tipi</span></pre>
+      <div class="note"><b>pratik kullanım</b> — bir form component'inde tüm alanlar zorunlu olan <span class="tp">User</span> tipini, düzenleme ekranında <span class="tp">Partial&lt;User&gt;</span> yaparak kısmi güncellemeye izin verirsin.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-index">TYPE / 15</div>
+      <h2>Type assertion</h2>
+      <p class="desc">Derleyiciye "buna güven" demenin (riskli) yolu.</p>
+      <pre><span class="kw">const</span> input = document.<span class="fn">getElementById</span>(<span class="st">'x'</span>) <span class="kw">as</span> <span class="tp">HTMLInputElement</span>;
+
+<span class="cm">// non-null assertion: kesin null olmadığını iddia etmek</span>
+<span class="kw">const</span> el = document.<span class="fn">getElementById</span>(<span class="st">'x'</span>)!;
+
+<span class="cm">// açı parantez yazımı da var ama .tsx dosyalarında JSX ile</span>
+<span class="cm">// karıştığı için 'as' yazımı tercih edilir</span></pre>
+      <div class="note"><b>dikkat</b> — assertion, runtime kontrolü yapmaz, sadece derleyiciyi susturur. Yanlışsa çalışma zamanında patlar. Mümkünse narrowing tercih et.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-index">TYPE / 16</div>
+      <h2>Modül import / export</h2>
+      <p class="desc">Tip ve değer export'larını ayırmak.</p>
+      <pre><span class="cm">// named export</span>
+<span class="kw">export</span> <span class="kw">interface</span> Props { title: <span class="tp">string</span>; }
+<span class="kw">export</span> <span class="kw">function</span> <span class="fn">Button</span>(props: Props) {}
+
+<span class="cm">// sadece tip import etmek istersen (derleme sonrası kod üretmez)</span>
+<span class="kw">import</span> <span class="kw">type</span> { Props } <span class="kw">from</span> <span class="st">'./Button'</span>;
+
+<span class="cm">// default export</span>
+<span class="kw">export</span> <span class="kw">default</span> <span class="fn">Button</span>;</pre>
+    </div>
+
+  </div>
+
+  <div class="section-label"><span>04 — REACT NATIVE'DE TYPESCRIPT</span><span>applied patterns</span></div>
+  <div class="grid">
+
+    <div class="card">
+      <div class="card-index">RN / 17</div>
+      <h2>Component props <span class="rn-tag">RN</span></h2>
+      <p class="desc">Fonksiyon component'inin prop şeklini tanımlamak.</p>
+      <pre><span class="kw">interface</span> ButtonProps {
+  label: <span class="tp">string</span>;
+  onPress: () =&gt; <span class="tp">void</span>;
+  disabled?: <span class="tp">boolean</span>; <span class="cm">// opsiyonel prop</span>
+}
+
+<span class="kw">function</span> <span class="fn">CustomButton</span>({ label, onPress, disabled }: ButtonProps) {
+  <span class="kw">return</span> (
+    &lt;TouchableOpacity onPress={onPress} disabled={disabled}&gt;
+      &lt;Text&gt;{label}&lt;/Text&gt;
+    &lt;/TouchableOpacity&gt;
+  );
+}</pre>
+    </div>
+
+    <div class="card">
+      <div class="card-index">RN / 18</div>
+      <h2>useState ile generic <span class="rn-tag">RN</span></h2>
+      <p class="desc">State'in tipini TypeScript çoğu zaman kendi çıkarır, ama belirsiz olduğunda generic ver.</p>
+      <pre><span class="cm">// tip otomatik çıkarılır: boolean</span>
+<span class="kw">const</span> [loading, setLoading] = <span class="fn">useState</span>(<span class="kw">false</span>);
+
+<span class="cm">// başlangıç değeri null olduğunda tip belirsizleşir, generic ver</span>
+<span class="kw">const</span> [user, setUser] = <span class="fn">useState</span>&lt;User | <span class="tp">null</span>&gt;(<span class="kw">null</span>);
+
+<span class="kw">const</span> [items, setItems] = <span class="fn">useState</span>&lt;<span class="tp">string</span>[]&gt;([]);</pre>
+    </div>
+
+    <div class="card">
+      <div class="card-index">RN / 19</div>
+      <h2>Event handler tipleri <span class="rn-tag">RN</span></h2>
+      <p class="desc">RN'de web'deki gibi ChangeEvent yok, kendi event tipleri var.</p>
+      <pre><span class="kw">import</span> { NativeSyntheticEvent, TextInputChangeEventData } <span class="kw">from</span> <span class="st">'react-native'</span>;
+
+<span class="kw">function</span> <span class="fn">handleChange</span>(
+  e: NativeSyntheticEvent&lt;TextInputChangeEventData&gt;
+) {
+  console.<span class="fn">log</span>(e.nativeEvent.text);
+}
+
+<span class="cm">// çoğu zaman daha basiti yeterli:</span>
+<span class="kw">function</span> <span class="fn">handleText</span>(text: <span class="tp">string</span>) {}
+&lt;TextInput onChangeText={handleText} /&gt;</pre>
+    </div>
+
+    <div class="card">
+      <div class="card-index">RN / 20</div>
+      <h2>children ve navigation tipleri <span class="rn-tag">RN</span></h2>
+      <p class="desc">Component'e children geçirmek ve navigation prop'larını tiplemek.</p>
+      <pre><span class="kw">import</span> { PropsWithChildren } <span class="kw">from</span> <span class="st">'react'</span>;
+
+<span class="kw">interface</span> CardProps {
+  title: <span class="tp">string</span>;
+}
+
+<span class="kw">function</span> <span class="fn">Card</span>({ title, children }: PropsWithChildren&lt;CardProps&gt;) {
+  <span class="kw">return</span> &lt;View&gt;&lt;Text&gt;{title}&lt;/Text&gt;{children}&lt;/View&gt;;
+}
+
+<span class="cm">// react-navigation ile screen prop tiplemek</span>
+<span class="kw">type</span> RootStackParamList = {
+  Home: <span class="kw">undefined</span>;
+  Profile: { userId: <span class="tp">string</span> };
+};</pre>
+      <div class="note"><b>not</b> — <span class="tp">Profile: { userId: string }</span> demek "Profile ekranına geçerken userId parametresi zorunlu" demek. <span class="tp">undefined</span> ise parametre almıyor demek.</div>
+    </div>
+
+  </div>
+
+</main>
+
+<footer>
+  yigit &middot; TypeScript cheatsheet &middot; akbank react native staj hazırlığı
+</footer>
+
+</body>
+</html>
