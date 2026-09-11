@@ -1,8 +1,9 @@
-import { Alert, View, Text, StyleSheet } from "react-native";
+import { Alert, View, Text, StyleSheet, ScrollView } from "react-native";
 import { useState, useEffect } from "react";
 import Title from "../components/Title";
 import NumberContainer from "../components/NumberContainer";
 import PrimaryButton from "../components/PrimaryButton";
+import GuessLogItem from "../components/GuessLogItem";
 import Card from "../components/Card";
 import Colors from "../utils/colors";
 import AntDesign from '@expo/vector-icons/AntDesign';
@@ -20,11 +21,14 @@ function generateRandomBetween(min, max, exclude) {
 }
 
 export default function GameScreen( { userNumber, onGameOver } ) {
-  const [currentGuess, setCurrentGuess] = useState(
-    generateRandomBetween(1, 99, userNumber)
-  );
+  const initialGuess = generateRandomBetween(1, 99, userNumber);
+  const [currentGuess, setCurrentGuess] = useState(initialGuess); // State to hold the current guess made by the app. Initially, it's set to a random number between 1 and 99, excluding the user's number.
   const [guessRange, setGuessRange] = useState({ min: 1, max: 99 });
-  
+  const [roundsNumber, setRoundsNumber] = useState([
+    { value: initialGuess, id: `${Date.now()}` },
+  ]); // State to hold the rounds taken to guess the user's number. Each round has a unique id, so React can track list items correctly even though we prepend new items.
+
+
   function nextGuessHandler(direction) {
     if (direction === "lower" && userNumber > currentGuess) {
       Alert.alert(
@@ -59,14 +63,25 @@ export default function GameScreen( { userNumber, onGameOver } ) {
 
     console.log(`Min: ${nextMin}, Max: ${nextMax}`);
     setGuessRange({ min: nextMin, max: nextMax });
-    setCurrentGuess(generateRandomBetween(nextMin, nextMax, currentGuess));
+    const newRndNumber = generateRandomBetween(nextMin, nextMax, currentGuess);
+    setCurrentGuess(newRndNumber);
+    setRoundsNumber((prevRounds) => [
+      { value: newRndNumber, id: `${Date.now()}` },
+      ...prevRounds,
+    ]); // Update the roundsNumber state by adding the new guess to the array of previous guesses.
   }
 
   useEffect(() => {
     if(currentGuess === userNumber) {
-      onGameOver(); // Call the onGameOver function passed as a prop when the current guess matches the user's number.
+      onGameOver(roundsNumber.length); // Call the onGameOver function passed as a prop when the current guess matches the user's number.
     }
   }, [currentGuess, userNumber, onGameOver]); // This effect runs whenever currentGuess or userNumber changes. If the current guess matches the user's number, it calls the onGameOver function to indicate that the game is over.
+
+  useEffect(() => {
+    setGuessRange({ min: 1, max: 99 }); // Reset the guess range to its initial values when the component mounts.
+  }, []); // This effect runs only once when the component mounts, resetting the guess range to its initial values.
+
+  const roundsListLength = roundsNumber.length; // Get the length of the roundsNumber array to display the number of rounds taken to guess the user's number.
 
   return (
     <View style={styles.container}>
@@ -96,6 +111,18 @@ export default function GameScreen( { userNumber, onGameOver } ) {
           </View>
         </View>
       </Card>
+      <ScrollView
+        style={styles.logContainer}
+        contentContainerStyle={styles.logContent}
+      >
+        {roundsNumber.map((round, index) => (
+          <GuessLogItem
+            key={round.id}
+            roundNumber={roundsListLength - index}
+            guess={round.value}
+          />
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -135,5 +162,13 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     flex: 1,
+  },
+  logContainer: {
+    flex: 1,
+    width: "100%",
+    maxWidth: 420,
+  },
+  logContent: {
+    paddingBottom: 24,
   },
 });

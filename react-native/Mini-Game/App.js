@@ -14,6 +14,7 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 export default function App() {
   const [userNumber, setUserNumber] = useState(); // State to hold the user's chosen number. Initially, it's undefined.
   const [gameOver, setGameOver] = useState(true); 
+  const [roundsNumber, setRoundsNumber] = useState(0); // State to hold the rounds taken to guess the user's number. 
 
   const [fontsLoaded, fontError] = useFonts({
     "open-sans": require("./assets/OpenSans-Regular.ttf"),
@@ -35,8 +36,9 @@ export default function App() {
     setUserNumber(pickedNumber); // Update the state with the number picked by the user.
   }
 
-  const gameOverHandler = () => {
+  const gameOverHandler = (numberOfRounds) => {
     setGameOver(true); // Set the gameOver state to true when the game is over.
+    setRoundsNumber(numberOfRounds); // Update the roundsNumber state with the number of rounds taken to guess the user's number.
   }
   
   // We are gonna do navigation programmatically, so we will not use the navigation prop here. Instead, we will use a state variable to determine which screen to show based on the user's input. If the user has confirmed a valid number, we will show the GameScreen; otherwise, we will show the StartGameScreen.
@@ -45,9 +47,14 @@ export default function App() {
   if(userNumber) { // If the user has picked a number, we will show the GameScreen.
     screen = <GameScreen userNumber={userNumber} onGameOver={gameOverHandler} />; // Show the GameScreen if a number has been picked.
   }
+  const onStartNewGame = () => {
+    setGameOver(false);
+    setUserNumber(null); 
+    setRoundsNumber(0); // Reset the roundsNumber state to an empty array when starting a new game.
+  };
 
   if(gameOver && userNumber) { // If the game is over and a number has been picked, we will show the GameOverScreen.
-    screen = <GameOverScreen />; // Show the GameOverScreen if the game is over and a number has been picked.
+    screen = <GameOverScreen roundsNumber={roundsNumber} userNumber={userNumber} onStartNewGame={onStartNewGame} />; // Show the GameOverScreen if the game is over and a number has been picked.
   }
 
   return (
