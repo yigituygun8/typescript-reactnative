@@ -1,10 +1,19 @@
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
-import { useState } from "react";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useCallback, useLayoutEffect, useState, useContext } from "react";
+import { FavoritesContext } from "../store/context/favorites-context";
 
 const PLACEHOLDER_IMAGE =
   "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/500px-No-Image-Placeholder.svg.png";
 
-const MealDetailScreen = ({ route }) => {
+const MealDetailScreen = ({ route, navigation }) => {
   const { mealProps } = route.params;
   const {
     title,
@@ -20,6 +29,35 @@ const MealDetailScreen = ({ route }) => {
     isLactoseFree,
   } = mealProps;
   const [imageUri, setImageUri] = useState(imageUrl);
+
+  const favoriteMealsCtx = useContext(FavoritesContext);
+  const mealIsFavorite = favoriteMealsCtx.ids.includes(mealProps.id);
+
+  const changeFavoriteStatusHandler = useCallback(() => {
+    if (mealIsFavorite) {
+      favoriteMealsCtx.removeFavorite(mealProps.id);
+    } else {
+      favoriteMealsCtx.addFavorite(mealProps.id);
+    }
+  }, [favoriteMealsCtx, mealProps.id, mealIsFavorite]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <Pressable
+          onPress={changeFavoriteStatusHandler}
+          accessibilityLabel="Add to favorites"
+          hitSlop={10}
+        >
+          {mealIsFavorite ? (
+            <Ionicons name="star" size={24} color="white" />
+          ) : (
+            <Ionicons name="star-outline" size={24} color="white" />
+          )}
+        </Pressable>
+      ),
+    });
+  }, [navigation, changeFavoriteStatusHandler, mealIsFavorite]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
